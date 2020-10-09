@@ -14,18 +14,18 @@ L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
   accessToken: API_KEY
 }).addTo(myMap);
 
-var urlEarthquake = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/1.0_hour.geojson";
+var urlEarthquake = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
 
 // Grabbing the data for the map
 d3.json(urlEarthquake, function(data) {
-  function styleInfo(features) {
+  function styleInfo(feature) {
     return {
       opacity: 1,
       fillOpacity: 1,
-      fillColor: getColor(features.properties.mag),
+      fillColor: getColor(feature.properties.mag),
       color: "#000000",
-      radius: getRadius(features.properties.mag),
+      radius: getRadius(feature.properties.mag),
       weight: 0.5
     };
   }
@@ -55,12 +55,23 @@ d3.json(urlEarthquake, function(data) {
     if (magnitude ===0) {
       return 1;
     }
-    return magnitude*3;
+    return magnitude*7;
   }
   
   //Adding the data from the GeoJson to the map that was created
-  function
+  // function
 
+  
+  //Finally adding the GeoJson to the map as a layer
+  L.geoJson(data, {
+    pointToLayer: function (feature, latlng) {
+      return L.circleMarker(latlng);
+    },
+    style: styleInfo,
+    onEachFeature: function(feature, layer) {
+      layer.bindPopup("Mag: " + feature.properties.mag + "<br>Place: " + feature.properties.place);
+    }
 
+  }).addTo(myMap);
 
 })
